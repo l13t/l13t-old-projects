@@ -12,8 +12,8 @@ if ($CONFIG['version'] >= 5 || !preg_match('/^(df|interface|snmp)$/', $item['p']
 Modified:
  - nut.php:
  
-diff cgp.orig/plugin/nut.php cgp/plugin/nut.php master
-20c20
-< $obj->data_sources = array(‘value’);
-—
-> $obj->data_sources = array(‘frequency’);
+ diff cgp.orig/plugin/nut.php cgp/plugin/nut.php master
+ 20c20
+ < $obj->data_sources = array(‘value’);
+ —
+ > $obj->data_sources = array(‘frequency’);
