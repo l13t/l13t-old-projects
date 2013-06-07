@@ -17,7 +17,7 @@ require_once 'inc/collectd.inc.php';
 $obj = new Type_Default($CONFIG);
 switch($obj->args['type']) {
 	case 'frequency':
-		$obj->data_sources = array('value');
+		$obj->data_sources = array('frequency');
 		$obj->ds_names = array('output' => 'Output');
 		$obj->rrd_title = sprintf('Frequency (%s)', $obj->args['pinstance']);
 		$obj->rrd_vertical = 'Hz';
