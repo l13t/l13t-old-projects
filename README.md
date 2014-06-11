@@ -29,3 +29,12 @@ Modified:
  
  > $obj->data_sources = array(‘frequency’);
 
+
+ - apache-mod-authnz - athentication in apache via simple perl script and postgresql database. need mod_authnz_external for work.
+
+ - db/backup - structure to weekly backups of mysql and pgsql
+
+ - nagios-plugins - some nagios/icinga plugins
+
+ - openvpn - script for generation openvpn bundles for clients
+
