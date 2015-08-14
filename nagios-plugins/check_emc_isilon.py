@@ -32,6 +32,25 @@ snmp_oids = {
 
 EXIT_STATUS=0
 
+def check_snmp_access(community, snmp_host):
+ res = 0
+ cmdGen = cmdgen.CommandGenerator()
+ errInd, errSt, errIndex, varBindTable = cmdGen.nextCmd(
+  cmdgen.CommunityData(community),
+  cmdgen.UdpTransportTarget((snmp_host, 161)),
+  snmp_oids['clusterName']
+ )
+ if errInd:
+  print 'CRITICAL: Indication Error' 
+  res = 1
+ else:
+  if errSt:
+   print('%s at %s' % (errSt.prettyPrint(), errIndex and varBinds[int(errIndex)] or '?'))
+   res = 1
+  else:
+   res = 0
+ return res
+
 def check_multi_snmp(community, snmp_host, oid):
  result = {}
  cmdGen = cmdgen.CommandGenerator()
@@ -107,6 +126,10 @@ community = _args['comm']
 command = _args['check']
 
 if (command == 'check_emc_isilon_clusterhealth'):
+ 
+ if check_snmp_access(community, ipaddr) != 0:
+  sys.exit(2)
+ 
  ch_status = check_snmp(community, ipaddr, snmp_oids['clusterHealth'])
  cl_name = check_snmp(community, ipaddr, snmp_oids['clusterName'])
  cl_conf_nodes = check_snmp(community, ipaddr, snmp_oids['configuredNodes'])
@@ -128,6 +151,10 @@ if (command == 'check_emc_isilon_clusterhealth'):
   EXIT_STATUS=3
  sys.exit(EXIT_STATUS)
 elif (command == "check_emc_isilon_nodehealth"):
+  
+ if check_snmp_access(community, ipaddr) != 0:
+  sys.exit(2)
+ 
  ch_status = check_snmp(community, ipaddr, snmp_oids['nodeHealth'])
  node_name = check_snmp(community, ipaddr, snmp_oids['nodeName'])
  node_ro = check_snmp(community, ipaddr, snmp_oids['nodeReadOnly'])
@@ -148,6 +175,10 @@ elif (command == "check_emc_isilon_nodehealth"):
   EXIT_STATUS=3
  sys.exit(EXIT_STATUS)
 elif (command == "check_emc_isilon_diskusage"):
+   
+ if check_snmp_access(community, ipaddr) != 0:
+  sys.exit(2)
+ 
  ch_warn = _args['warn']
 
  ch_crit = _args['crit']
@@ -166,6 +197,10 @@ elif (command == "check_emc_isilon_diskusage"):
    print "CRITICAL: Critical with " + str(usage_per) + " % of free space on cluster"
    sys.exit(2)
 elif (command == 'check_emc_isilon_diskstatus'):
+   
+ if check_snmp_access(community, ipaddr) != 0:
+  sys.exit(2)
+ 
  diskbay = check_multi_snmp(community, ipaddr, snmp_oids['diskBay'])
  diskdevname = check_multi_snmp(community, ipaddr, snmp_oids['diskDeviceName'])
  diskstat = check_multi_snmp(community, ipaddr, snmp_oids['diskStatus'])
@@ -178,7 +213,7 @@ elif (command == 'check_emc_isilon_diskstatus'):
   #print disksernum[i]
   #print '=========='
   if (diskstat[i] != "HEALTHY"):
-		 ERROR_CODES[diskbay[i]] = "Bay " + str(diskbay[i]) + " | Serianl Num.: " + str(disksernum[i]) + " | Disk status: " + diskstat[i]
+   ERROR_CODES[diskbay[i]] = "Bay " + str(diskbay[i]) + " | Serianl Num.: " + str(disksernum[i]) + " | Disk status: " + diskstat[i]
  if (ERROR_CODES == {}):
   print "OK: That's all fine with disk health on node"
   sys.exit(0)
