@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 
+'''
+Works for next configuration:
+virtual=<virtual_ip>:80
+    real=<real_ip_1>:80 masq 100
+    real=<real_ip_2>:80 masq 100
+    scheduler=wlc
+    protocol=tcp
+    checktype=connect
+
+In such configuration if real server or port on real server would be
+unreachable, script would see weight of real server equal 0.
+'''
+
 import argparse
 import sys
 import re
