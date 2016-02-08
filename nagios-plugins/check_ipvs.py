@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 
-'''
-Works for next configuration:
-virtual=<virtual_ip>:80
-    real=<real_ip_1>:80 masq 100
-    real=<real_ip_2>:80 masq 100
-    scheduler=wlc
-    protocol=tcp
-    checktype=connect
-
-In such configuration if real server or port on real server would be
-unreachable, script would see weight of real server equal 0.
-'''
-
 import argparse
 import sys
 import re
@@ -58,21 +45,20 @@ parent_parser = argparse.ArgumentParser(add_help=True, description='Check for ld
 parent_parser.add_argument('--proto', type=str, help="Set protocol for service (tcp, udp)", default="tcp")
 parent_parser.add_argument('--service', type=str, help="Specify service name (It should be specified like <ip_address>:<port>)")
 parent_parser.add_argument('--sudo', help="Use SUDO to get information", action="store_true")
-#parent_parser.add_argument('--crit', type=int, help="Exit with CRITICAL status if less than PERCENT of disk space is free", default=10)
 _args = vars(parent_parser.parse_args())
 
-### Check if ivery time: unknouser specified protocol type
+### Check if specified protocol type is correct
 if _args['proto'] not in protocol_list:
   print("ERROR: Wrong protocol type is specified\n")
   parent_parser.print_help()
   sys.exit(3)
 
-### Check user specified service address
+### Check if service is specified 
 if (_args['service'] == None):
   parent_parser.print_help()
   sys.exit(3)
 
-### Check service address is correct
+### Check if service address is correct ip address and port is not out of range
 ip_info = re.split(":", _args['service'])
 if not(text_is_ip(ip_info[0])):
   print("ERROR: You specified wrong ip\n")
@@ -93,7 +79,6 @@ if not(1 <= port <=65535):
 if _args['sudo']:
   sudo = "sudo "
 
-### Generate and run shell command
 cmd = sudo + "/sbin/ipvsadm -L -n " + protocol_list[_args['proto']] + " " + _args['service']
 result = os.popen(cmd).read()
 
@@ -115,6 +100,6 @@ if issues != []:
   print(nagios_output)
   sys.exit(2)
 else:
-  nagios_output = "OK: Service " + ipvs['vip'] + ":" + ipvs['vport'] + " work as expected."
+  nagios_output = "OK: Service " + ipvs['vip'] + ":" + ipvs['vport'] + " work as expected. " + str(len(ipvs['nodes'])) + " are available."
   print(nagios_output)
   sys.exit(0)
