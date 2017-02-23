@@ -13,17 +13,22 @@ def oom_check(mode, verbose=False):
     while '' in _dmesg_res:
         _dmesg_res.remove('')
     #print(dmesg_results)
+    print(mode)
     exitcode=0
     if len(_dmesg_res) > 2:
         message = "CRITICAL: There are couple of OOM events. You can check them with: (dmesg | awk '/invoked oom-killer:/ || /Killed process/') and reset with dmesg -c when finished"
         if verbose:
             message = message + dmesg_results
         exitcode = 2
+        if mode == 'warning':
+            exitcode = 1
     elif len(_dmesg_res) == 2:
         message = "WARNING: 1 process was killed by OOM. You can check them with: (dmesg | awk '/invoked oom-killer:/ || /Killed process/) and reset with dmesg -c when finished"
         if verbose:
             message = message + "\r\r" + dmesg_results
         exitcode = 1
+        if mode == 'critical':
+            exitcode = 2
     else:
         message = "OK: No OOM killer activity found in dmesg output"
     return exitcode, message
@@ -45,7 +50,7 @@ def gtfo(exitcode, message=''):
 
 def main():
     args = parse_args()
-    print(args.mode)
+    #print(args.mode)
     exitcode, message = oom_check(args.mode, args.verbose)
     gtfo(exitcode, message)
 
