@@ -34,8 +34,6 @@ Modified:
 
  - db/backup - structure to weekly backups of mysql and pgsql
 
- - nagios-plugins - some nagios/icinga plugins
-
  - openvpn - script for generation openvpn bundles for clients
 
  - aws/add\_cloudflare\_ips.sh - script which automatically gets group where you need to whitelist CF IP's, compare with its current state and update it
